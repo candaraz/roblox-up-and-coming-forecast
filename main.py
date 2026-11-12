@@ -174,7 +174,7 @@ def forecast(task, reads):
             game["strength"] = (
                 0.9 * playing_z
                 + 0.6 * votes_z
-                + 0.5 * game_rank_z
+                + 0.8 * game_rank_z
                 - 0.05 * max(0.0, game["age_days"] - 21.0) ** 1.5
             )
 
@@ -187,7 +187,7 @@ def forecast(task, reads):
 
     probabilities = []
     for place in range(1, PLACES + 1):
-        sigma = 2.5 if place <= 3 else 3.5
+        sigma = 2.2 if place <= 3 else 3.2
         candidates = sorted(
             eligible,
             key=lambda item: (
@@ -195,7 +195,7 @@ def forecast(task, reads):
                 -item[1]["strength"],
                 item[0],
             ),
-        )[:15]
+        )[:12]
         weights = [
             math.exp(-((game["pred_rank"] - place) / sigma) ** 2 / 2.0)
             for _, game in candidates
@@ -204,7 +204,7 @@ def forecast(task, reads):
         if not weight_sum:
             continue
         for (universe_id, _), weight in zip(candidates, weights):
-            probability = round(0.90 * weight / weight_sum, 8)
+            probability = round(0.95 * weight / weight_sum, 8)
             if probability > 0:
                 probabilities.append(
                     {"universe_id": universe_id, "place": place, "p": probability}
